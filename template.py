@@ -4,7 +4,11 @@ from collections import defaultdict
 from tqdm import tqdm
 from jugador import Jugador
 
+
 class AmbienteDiezMil:
+    """
+        Ambiente del Juego 10.000.
+    """
     
     def __init__(self):
         """Definir las variables de instancia de un ambiente.
@@ -31,6 +35,9 @@ class AmbienteDiezMil:
         pass
 
 class EstadoDiezMil:
+    """ Representación de un estado del juego 10.000.
+    """
+
     def __init__(self):
         """Definir qué hace a un estado de diez mil.
         Recordar que la complejidad del estado repercute en la complejidad de la tabla del agente de q-learning.
@@ -60,7 +67,11 @@ class EstadoDiezMil:
         """
         pass   
 
+
 class AgenteQLearning:
+    """ Agente que implementa el algoritmo de Q-Learning.
+    """
+
     def __init__(
         self,
         ambiente: AmbienteDiezMil,
@@ -103,11 +114,18 @@ class AgenteQLearning:
         """
         pass
 
+
 class JugadorEntrenado(Jugador):
+    """ Jugador que implementa una política entrenada con un agente de RL.
+
+    Args:
+        Jugador (_type_): _description_
+    """
+
     def __init__(self, nombre: str, filename_politica: str):
         self.nombre = nombre
-        self.politica = self._leer_politica(filename_politica)
-        
+        self.politica = self._leer_politica(filename_politica, SEP=',')
+ 
     def _leer_politica(self, filename:str, SEP:str=','):
         """Carga una politica entrenada con un agente de RL, que está guardada
         en el archivo filename en un formato conveniente.
@@ -115,8 +133,8 @@ class JugadorEntrenado(Jugador):
         Args:
             filename (str): Nombre/Path del archivo que contiene a una política almacenada. 
         """
-        pass
-    
+        return
+
     def jugar(
         self,
         puntaje_total:int,

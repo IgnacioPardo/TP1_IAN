@@ -125,8 +125,8 @@ class JugadorEntrenado(Jugador):
     def __init__(self, nombre: str, filename_politica: str):
         self.nombre = nombre
         self.politica = self._leer_politica(filename_politica, SEP=',')
- 
-    def _leer_politica(self, filename:str, SEP:str=','):
+
+    def _leer_politica(self, filename: str, SEP: str=','):
         """Carga una politica entrenada con un agente de RL, que está guardada
         en el archivo filename en un formato conveniente.
 

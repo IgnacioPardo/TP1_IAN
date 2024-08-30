@@ -114,15 +114,10 @@ class AmbienteDiezMil:
             tuple[int, bool]: Una recompensa y un flag que indica si terminó el turno.
         """
 
-        if self.puntaje_total >= 10000:
-            self.estado.fin_turno()
-            recompensa = 10000
-            finalizado = True
-            return recompensa, finalizado
-
         finalizado: bool = False
 
         if accion == JUGADA_PLANTARSE:
+            self.puntaje_total += self.estado.puntaje_acumulado_turno
             self.estado.fin_turno()
             finalizado = True
             recompensa = self.calcular_recompensa()
@@ -130,8 +125,14 @@ class AmbienteDiezMil:
         elif accion == JUGADA_TIRAR:
             puntaje, dados = puntaje_y_no_usados(np.random.randint(1, 7, 6))
             self.estado.actualizar_estado(puntaje, len(dados))
-            self.puntaje_total += puntaje
             recompensa = self.calcular_recompensa()
+
+            if (self.puntaje_total + self.estado.puntaje_acumulado_turno) >= 10000:
+                self.puntaje_total = 10000
+                self.estado.fin_turno()
+                recompensa = 10000
+                finalizado = True
+                return recompensa, finalizado
 
             if puntaje == 0:
                 self.estado.fin_turno()
@@ -159,8 +160,8 @@ class EstadoDiezMil:
 
         self.puntaje_acumulado_turno: int = 0
         self.dados_disponibles: int = 6
-        self.turno: int = 0
-        self.nro_tirada: int = 0
+        # self.turno: int = 0
+        # self.nro_tirada: int = 0
 
     def actualizar_estado(self, *args, **kwargs) -> None:
         """Modifica las variables internas del estado luego de una tirada.
@@ -179,8 +180,8 @@ class EstadoDiezMil:
         """Modifica el estado al terminar el turno."""
         self.puntaje_acumulado_turno = 0
         self.dados_disponibles = 6
-        self.turno += 1
-        self.nro_tirada: int = 0
+        # self.turno += 1
+        # self.nro_tirada: int = 0
         # Faltaria modificar puntaje_acumulado_total cada vez que termina un turno
 
     def __str__(self):
@@ -191,7 +192,7 @@ class EstadoDiezMil:
             str: Representación en texto de EstadoDiezMil.
         """
 
-        return f"Estado: {self.puntaje_acumulado_turno}, {self.dados_disponibles}, {self.turno}"
+        return f"Estado: {self.puntaje_acumulado_turno}, {self.dados_disponibles}"
 
 
 class Validador:
@@ -265,7 +266,7 @@ class AgenteQLearning:
         self.epsilon = epsilon  # 0.1
         # Se puede cuantizar los 10k (nunca puedo tener 1,2,3...49, etc puntos)
         forma = (
-            20000,
+            10000,
             7,
             2
         )
@@ -341,7 +342,6 @@ class AgenteQLearning:
                     pts,
                     dados,
                     accion,
-                
                 ]
 
                 recompensa, finalizado = self.ambiente.step(accion)

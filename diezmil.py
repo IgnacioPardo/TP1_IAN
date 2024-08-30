@@ -1,5 +1,4 @@
 from random import randint
-from template import JugadorEntrenado
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 
@@ -71,6 +70,8 @@ class JuegoDiezMil:
 
 
 def main():
+    from template import JugadorEntrenado
+
     jugador = JugadorAleatorio("random")
     juego = JuegoDiezMil(jugador)
     (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)

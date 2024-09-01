@@ -17,29 +17,18 @@ class AmbienteDiezMil:
         self.turno = 0
         self.estado = EstadoDiezMil()
         self.puntaje_total = 0
-        self.factor_aleatoriedad = 0.05
-        self.limite_superior = 10000
-        self.limite_inferior = 5000
 
         self.calcular_recompensa = [
             self.calcular_recompensa_0,
             self.calcular_recompensa_1,
             self.calcular_recompensa_2,
-            self.calcular_recompensa_3,
-            self.calcular_recompensa_4,
-            self.calcular_recompensa_5,
-            self.calcular_recompensa_6,
-            self.calcular_recompensa_7,
-            self.calcular_recompensa_8,
-            self.calcular_recompensa_9,
-            self.calcular_recompensa_10,
-            self.calcular_recompensa_11,
-            self.calcular_recompensa_12,
-            self.calcular_recompensa_13,
         ][reward_func_type]
 
     def calcular_recompensa_0(self):
-        return self.estado.puntaje_acumulado_turno
+        if self.estado.puntaje_acumulado_turno == 0:
+            return -1
+        else:
+            return 1
 
     def calcular_recompensa_1(self):
         return self.estado.puntaje_acumulado_turno / (self.turno + 1)
@@ -47,54 +36,6 @@ class AmbienteDiezMil:
     def calcular_recompensa_2(self):
         return self.estado.puntaje_acumulado_turno / (self.turno + 1) ** 2
 
-    def calcular_recompensa_3(self):
-        return 1 if self.puntaje_total >= 10000 else 0
-
-    def calcular_recompensa_4(self):
-        return self.estado.puntaje_acumulado_turno / 10000
-
-    def calcular_recompensa_5(self):
-        return (self.estado.puntaje_acumulado_turno + self.puntaje_total) / (
-            self.turno + 2
-        )
-
-    def calcular_recompensa_6(self):
-        return self.estado.puntaje_acumulado_turno * self.turno
-
-    def calcular_recompensa_7(self):
-        return self.estado.puntaje_acumulado_turno / max(1, self.puntaje_total)
-
-    def calcular_recompensa_8(self):
-        return self.estado.puntaje_acumulado_turno * (self.factor_aleatoriedad + 1)
-
-    def calcular_recompensa_9(self):
-        return (
-            self.estado.puntaje_acumulado_turno / (self.turno + 1)
-            if self.puntaje_total < 5000
-            else self.estado.puntaje_acumulado_turno * 2
-        )
-
-    def calcular_recompensa_10(self):
-        return (self.estado.puntaje_acumulado_turno / (self.turno + 1)) ** (
-            self.puntaje_total / 10000
-        )
-
-    def calcular_recompensa_11(self):
-        return (
-            self.estado.puntaje_acumulado_turno * (1 + self.factor_aleatoriedad)
-            if self.puntaje_total > self.limite_superior
-            else self.estado.puntaje_acumulado_turno
-        )
-
-    def calcular_recompensa_12(self):
-        return self.estado.puntaje_acumulado_turno / (
-            1 + abs(self.puntaje_total - 10000)
-        )
-
-    def calcular_recompensa_13(self):
-        return (
-            self.estado.puntaje_acumulado_turno + self.turno * self.factor_aleatoriedad
-        ) / max(1, self.turno)
 
     def reset(self):
         """Reinicia el ambiente para volver a realizar un episodio."""
@@ -123,14 +64,14 @@ class AmbienteDiezMil:
             recompensa = self.calcular_recompensa()
 
         elif accion == JUGADA_TIRAR:
-            puntaje, dados = puntaje_y_no_usados(np.random.randint(1, 7, 6))
+            puntaje, dados = puntaje_y_no_usados(np.random.randint(1, 7, self.estado.dados_disponibles))
             self.estado.actualizar_estado(puntaje, len(dados))
             recompensa = self.calcular_recompensa()
 
             if (self.puntaje_total + self.estado.puntaje_acumulado_turno) >= 10000:
                 self.puntaje_total = 10000
                 self.estado.fin_turno()
-                recompensa = 10000
+                recompensa = self.calcular_recompensa()
                 finalizado = True
                 return recompensa, finalizado
 
@@ -292,8 +233,12 @@ class AgenteQLearning:
 
         if self.ambiente.estado.dados_disponibles == 0:
             return JUGADA_PLANTARSE
+        
+        #HAY QUE REVISARLO, PORQUE PODRIAS TENER 6 DADOS PORQUE YA USASTE TODOS Y AHI TE ARRIESGAS A PERDER
+        if self.ambiente.estado.dados_disponibles == 6:
+            return JUGADA_TIRAR
 
-        if self.ambiente.estado.puntaje_acumulado_turno >= 10000:
+        if (self.ambiente.puntaje_total + self.ambiente.estado.puntaje_acumulado_turno) >= 10000:
             return JUGADA_PLANTARSE
 
         if np.random.rand() < self.epsilon:
@@ -306,6 +251,10 @@ class AgenteQLearning:
             #     return self.posibles_acciones[1]
 
             pts = np.clip(self.ambiente.estado.puntaje_acumulado_turno, 0, 10000)
+
+            if self.q_table[pts,self.ambiente.estado.dados_disponibles,0] == self.q_table[pts,self.ambiente.estado.dados_disponibles,1]:
+                return np.random.choice(self.posibles_acciones)
+
             return self.posibles_acciones[
                 int(
                     np.argmax(
@@ -318,7 +267,7 @@ class AgenteQLearning:
                 )
             ]
 
-    def entrenar(self, episodios: int, verbose: bool = False, validate: bool = False) -> None:
+    def entrenar(self, episodios: int, verbose: bool = False) -> None:
         """Dada una cantidad de episodios, se repite el ciclo del algoritmo de Q-learning.
         Recomendación: usar tqdm para observar el progreso en los episodios.
 
@@ -327,13 +276,16 @@ class AgenteQLearning:
             verbose (bool, optional): Flag para hacer visible qué ocurre en cada paso. Defaults to False.
         """
         # log = print if verbose else lambda *args: None
+        print("Entrenando...")
         iter = tqdm(range(episodios)) if verbose else range(episodios)
         for ep in iter:
             self.ambiente.reset()
             finalizado = False
 
-            while not finalizado:
+            # accion = self.posibles_acciones[1]
+            # self.ambiente.step(accion)
 
+            while not finalizado:
                 accion = self.elegir_accion()
                 pts = self.ambiente.estado.puntaje_acumulado_turno
                 dados = self.ambiente.estado.dados_disponibles
@@ -362,16 +314,17 @@ class AgenteQLearning:
                     recompensa + self.gamma * q_siguiente - q_actual
                 )
 
-            val_promedio = 0
-            if validate:
-                val = Validador(self.ambiente)
-                val_promedio = val.validar_politica(self.q_table2pol(), 100)
+            # val_promedio = 0
+            # if validate:
+            #     val = Validador(self.ambiente)
+            #     val_promedio = val.validar_politica(self.q_table2pol(), 100)
 
             if verbose:
                 iter.set_description(
-                    f"Episodio {ep}" + f" - Validación: {val_promedio}" if validate else ""
+                    f"Episodio {ep}"
+                    #  + f" - Validación: {val_promedio}" if validate else ""
                 )
-            yield val_promedio
+            # yield val_promedio
 
     def q_table2pol(self):
         """Convierte la tabla Q en una política."""
@@ -383,7 +336,7 @@ class AgenteQLearning:
         Args:
             filename (str): Nombre/Path del archivo a generar.
         """
-
+        print("Politica...")
         # Save 0 or 1 in each of the forma[0] * forma[1] cells
         politica = self.q_table2pol()
         np.savetxt(filename, politica, delimiter=",")
@@ -492,3 +445,4 @@ class JugadorFromPolicy(Jugador):
             return (JUGADA_PLANTARSE, [])
         elif jugada == JUGADA_TIRAR:
             return (JUGADA_TIRAR, no_usados)
+

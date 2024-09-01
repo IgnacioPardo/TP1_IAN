@@ -1,6 +1,6 @@
 import argparse
 from diezmil import JuegoDiezMil
-from template import JugadorEntrenado
+from jugador import JugadorEntrenado
 
 def main(politica_filename, verbose):
     jugador = JugadorEntrenado('qlearning', politica_filename)

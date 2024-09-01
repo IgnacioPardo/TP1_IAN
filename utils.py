@@ -10,6 +10,20 @@ JUGADAS_STR = {
     JUGADA_TIRAR: "Tirar",
 }
 
+RANGOS = [
+    (0, 1),        # 1 -> 0
+    (1, 1000),     # 2 -> [1, 1000)
+    (1000, 2000),  # 3 -> [1000, 2000)
+    (2000, 3000),  # 4 -> [2000, 3000)
+    (3000, 4000),  # 5 -> [3000, 4000)
+    (4000, 5000),  # 6 -> [4000, 5000)
+    (5000, 6000),  # 7 -> [5000, 6000)
+    (6000, 7000),  # 8 -> [6000, 7000)
+    (7000, 8000),  # 9 -> [7000, 8000)
+    (8000, 9000),  # 10 -> [8000, 9000)
+    (9000, 10000)  # 11 -> [9000, 10000)
+]
+
 def puntaje_y_no_usados(ds: list[int]) -> tuple[int, list[int]]:
     ''' Dada ds, una lista de enteros del 1 al 6 (dados), devuelve una tupla
         con el puntaje de los dados y los dados no usados (en orden).
@@ -60,3 +74,22 @@ def separar(xs: list[int], ys: list[int]) -> list[int]:
     for y in ys:
         res.remove(y)
     return res
+
+
+def snap_puntos(valor_entrada):
+    """Dado un valor de entrada, retorna el rango al que pertenece en miles."""
+
+    # Definir los rangos y sus valores asociados
+    rangos = RANGOS
+    
+    # Verificar en qué rango cae el valor de entrada
+    for i, (inicio, fin) in enumerate(rangos):
+        if inicio <= valor_entrada < fin:
+            return i
+    
+    # Si el valor es exactamente 10000, retornar 10 (último rango)
+    if valor_entrada == 10000:
+        return 10
+    
+    # En caso de que el valor esté fuera de los límites
+    return None

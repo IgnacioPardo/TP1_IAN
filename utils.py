@@ -21,7 +21,8 @@ RANGOS = [
     (6000, 7000),  # 8 -> [6000, 7000)
     (7000, 8000),  # 9 -> [7000, 8000)
     (8000, 9000),  # 10 -> [8000, 9000)
-    (9000, 10000)  # 11 -> [9000, 10000)
+    (9000, 10000),  # 11 -> [9000, 10000)
+    (10000, int(1e10))  # 12 -> [10000, inf)
 ]
 
 def puntaje_y_no_usados(ds: list[int]) -> tuple[int, list[int]]:
@@ -87,9 +88,3 @@ def snap_puntos(valor_entrada):
         if inicio <= valor_entrada < fin:
             return i
     
-    # Si el valor es exactamente 10000, retornar 10 (último rango)
-    if valor_entrada == 10000:
-        return 10
-    
-    # En caso de que el valor esté fuera de los límites
-    return None

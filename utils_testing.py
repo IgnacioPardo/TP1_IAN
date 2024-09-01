@@ -2,6 +2,7 @@ import unittest
 from utils import (
     puntaje_y_no_usados,
     separar,
+    snap_puntos,
     PUNTAJE_ESCALERA,
     PUNTAJE_3_PARES,
     PUNTAJE_6_IGUALES
@@ -118,5 +119,20 @@ class TestSepararDados(unittest.TestCase):
         self.assertEqual(separar([3,2,2], [2,2,3]), [])
         self.assertEqual(separar([3,2,1], [2,1,3]), [])
 
+
+class TestSnapPuntos(unittest.TestCase):
+    def test_snap_puntos(self):
+        self.assertEqual(snap_puntos(0), 0)
+        self.assertEqual(snap_puntos(1), 1)
+        self.assertEqual(snap_puntos(999), 1)
+        self.assertEqual(snap_puntos(1000), 2)
+        self.assertEqual(snap_puntos(1999), 2)
+        self.assertEqual(snap_puntos(2000), 3)
+        self.assertEqual(snap_puntos(9999), 10)
+        self.assertEqual(snap_puntos(10000), 11)
+        self.assertEqual(snap_puntos(10001), 11)
+        self.assertEqual(snap_puntos(15000), 11)
+
+        
 if __name__ == "__main__":
     unittest.main()

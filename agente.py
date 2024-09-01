@@ -30,7 +30,7 @@ class AgenteQLearning:
         self.epsilon = epsilon  # 0.1
         # Se puede cuantizar los 10k (nunca puedo tener 1,2,3...49, etc puntos)
         forma = (
-            11,
+            12,
             7,
             2
         )
@@ -54,22 +54,18 @@ class AgenteQLearning:
         Selecciona una acción de acuerdo a una política ε-greedy.
         """
 
-        if self.ambiente.estado.dados_disponibles == 0:
-            return JUGADA_PLANTARSE
-
-        if self.ambiente.estado.puntaje_acumulado_turno_snap >= 10000:
-            return JUGADA_PLANTARSE
+        estado = (self.ambiente.estado.puntaje_turno_miles, self.ambiente.estado.dados_disponibles)
 
         if np.random.rand() < self.epsilon:
             return np.random.choice(self.posibles_acciones)
         else:
             # Select either self.posibles_acciones[0] or self.posibles_acciones[1] based on the Q table
-            if self.q_table[self.ambiente.estado.puntaje_acumulado_turno_snap, self.ambiente.estado.dados_disponibles, 0] > self.q_table[self.ambiente.estado.puntaje_acumulado_turno_snap, self.ambiente.estado.dados_disponibles, 1]:
+            if self.q_table[estado[0], estado[1], self.posibles_acciones[0]] >= self.q_table[estado[0], estado[1], self.posibles_acciones[1]]:
                 return self.posibles_acciones[0]
             else:
                 return self.posibles_acciones[1]
 
-    def entrenar(self, episodios: int, verbose: bool = False, validate: bool = False) -> None:
+    def entrenar(self, episodios: int, verbose: bool = False) -> None:
         """Dada una cantidad de episodios, se repite el ciclo del algoritmo de Q-learning.
         Recomendación: usar tqdm para observar el progreso en los episodios.
 
@@ -79,14 +75,14 @@ class AgenteQLearning:
         """
         # log = print if verbose else lambda *args: None
         iterator = tqdm(range(episodios)) if verbose else range(episodios)
-        for ep in iterator:
+        for _ in iterator:
             self.ambiente.reset()
             juego_finalizado = False
 
             while not juego_finalizado:
 
                 accion = self.elegir_accion()
-                pts = self.ambiente.estado.puntaje_acumulado_turno_snap
+                pts = self.ambiente.estado.puntaje_turno_miles
                 dados = self.ambiente.estado.dados_disponibles
 
                 q_actual = self.q_table[
@@ -95,12 +91,12 @@ class AgenteQLearning:
                     accion,
                 ]
 
-                recompensa, _, juego_finalizado = self.ambiente.step(accion)
+                recompensa, turno_finalizado, juego_finalizado = self.ambiente.step(accion)
 
                 q_siguiente = np.max(
                     self.q_table[
-                        self.ambiente.estado.puntaje_acumulado_turno_snap,
-                        self.ambiente.estado.dados_disponibles,
+                        self.ambiente.estado.puntaje_turno_miles,
+                        self.ambiente.estado.dados_disponibles if not turno_finalizado else 0,
                         :,
                     ]
                 )
@@ -113,16 +109,7 @@ class AgenteQLearning:
                     recompensa + self.gamma * q_siguiente - q_actual
                 )
 
-            val_promedio = 0
-            if validate:
-                val = Validador(self.ambiente)
-                val_promedio = val.validar_politica(self.q_table2pol(), 100)
-                yield val_promedio
 
-            if verbose:
-                iterator.set_description(
-                    f"Episodio {ep}" + f" - Validación: {val_promedio}" if validate else ""
-                )
 
     def q_table2pol(self):
         """Convierte la tabla Q en una política."""

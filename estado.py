@@ -61,35 +61,28 @@ class EstadoDiezMilv2:
         Recordar que la complejidad del estado repercute en la complejidad de la tabla del agente de q-learning.
 
         Estado S = (
-            puntaje_acumulado_turno (11 posibles valores: 1-> 0 2->[1, 1000), ..., 11->[9000, 10000)),
-            dados_disponibles,
+            puntaje_acumulado_turno (12 posibles valores: 1-> 0 2->[1, 1000), ..., 11->[9000, 10000)),
+            dados_disponibles (7 posibles valores: 0-> 0, 1-> 1, ..., 6-> 6)
         )
 
         """
 
-        self.puntaje_acumulado_turno_snap: int = 0
+        self.puntaje_turno_miles: int = 0
         self.dados_disponibles: int = 6
-        self.nro_tirada: int = 0
 
-    def actualizar_estado(self, *args, **kwargs) -> None:
+    def actualizar_estado(self, puntos_turno, dados_disponibles) -> None:
         """Modifica las variables internas del estado luego de una tirada.
 
         Args:
-            args: (Puntaje obtenido en la tirada, cantidad de dados disponibles)
+            args: (Puntaje acumulado del turno, cantidad de dados disponibles)
         """
-        if args[0] == 0:
-            self.puntaje_acumulado_turno_snap = 0
-            self.dados_disponibles = 0
-        else:
-            self.puntaje_acumulado_turno_snap = snap_puntos(args[0])
-            self.dados_disponibles = args[1]
-        self.nro_tirada += 1
+        self.puntaje_turno_miles = snap_puntos(puntos_turno)
+        self.dados_disponibles = dados_disponibles
 
     def fin_turno(self):
         """Modifica el estado al terminar el turno."""
-        self.puntaje_acumulado_turno_snap = 0
+        self.puntaje_turno_miles = 0
         self.dados_disponibles = 6
-        self.nro_tirada: int = 0
 
     def __str__(self):
         """Representación en texto de EstadoDiezMil.
@@ -99,4 +92,4 @@ class EstadoDiezMilv2:
             str: Representación en texto de EstadoDiezMil.
         """
 
-        return f"Estado: {self.puntaje_acumulado_turno_snap}, {self.dados_disponibles}"
+        return f"Estado: {self.puntaje_turno_miles}, {self.dados_disponibles}"

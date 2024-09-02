@@ -136,3 +136,46 @@ class JugadorFromPolicy(Jugador):
         elif jugada == JUGADA_TIRAR:
             return (JUGADA_TIRAR, no_usados)
 
+
+class JugadorFromPolicyV2(Jugador):
+    """Jugador que implementa una política entrenada con un agente de RL.
+
+    Args:
+        politica (np.array): Política entrenada.
+    """
+
+    def __init__(self, politica: np.array):
+        self.politica = politica
+        self.posibles_acciones = [JUGADA_PLANTARSE, JUGADA_TIRAR]
+
+    def jugar(
+        self,
+        puntaje_total: int,
+        puntaje_turno: int,
+        dados: list[int],
+        verbose:bool=False
+    ) -> tuple[int, list[int]]:
+        """Devuelve una jugada y los dados a tirar.
+
+        Args:
+            puntaje_total (int): Puntaje total del jugador en la partida.
+            puntaje_turno (int): Puntaje en el turno del jugador
+            dados (list[int]): Tirada del turno.
+
+        Returns:
+            tuple[int,list[int]]: Una jugada y la lista de dados a tirar.
+        """
+
+        puntaje, no_usados = puntaje_y_no_usados(dados)
+        pts = puntaje_turno  # + puntaje
+        if puntaje == 0:
+            pts = 0
+
+        jugada = self.posibles_acciones[
+            int(self.politica[pts // 1000, len(no_usados)])
+        ]
+
+        if jugada == JUGADA_PLANTARSE:
+            return (JUGADA_PLANTARSE, [])
+        elif jugada == JUGADA_TIRAR:
+            return (JUGADA_TIRAR, no_usados)

@@ -46,8 +46,8 @@ class AgenteQLearning:
                 shape (tuple): Dimensiones de la tabla Q.
                 q_init_scale (float): Escala para los valores iniciales de la tabla
         """
-        # self.q_table = np.random.uniform(0, 1, shape) * q_init_scale
-        self.q_table = np.zeros(shape)
+        self.q_table = np.random.uniform(0, 1, shape) * q_init_scale
+        # self.q_table = np.zeros(shape)
 
     def elegir_accion(self):
         """
@@ -79,7 +79,8 @@ class AgenteQLearning:
             self.ambiente.reset()
             juego_finalizado = False
 
-            while not juego_finalizado:
+            # while not juego_finalizado:
+            while self.ambiente.puntaje_total < 10000:
 
                 accion = self.elegir_accion()
                 pts = self.ambiente.estado.puntaje_turno_miles

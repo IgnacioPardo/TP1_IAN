@@ -48,7 +48,6 @@ class AmbienteDiezMil:
                 turno_finalizado = True
                 recompensa = 0
             else:
-                self.puntaje_total += puntaje
                 self.estado.actualizar_estado(puntaje, len(no_usados))
                 recompensa = self.estado.puntaje_turno_miles * self.multiplicador_recompensa
 

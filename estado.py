@@ -66,23 +66,32 @@ class EstadoDiezMilv2:
         )
 
         """
+        # Solo para calcular el puntaje en miles
+        # NO es parte del estado
+        self.puntaje_turno: int = 0
 
+        # Variables del estado
         self.puntaje_turno_miles: int = 0
         self.dados_disponibles: int = 6
 
-    def actualizar_estado(self, puntos_turno, dados_disponibles) -> None:
+    def actualizar_estado(self, puntaje, dados_disponibles) -> None:
         """Modifica las variables internas del estado luego de una tirada.
 
         Args:
             args: (Puntaje acumulado del turno, cantidad de dados disponibles)
         """
-        self.puntaje_turno_miles = snap_puntos(puntos_turno)
+        self.puntaje_turno += puntaje
+        self.puntaje_turno_miles = snap_puntos(self.puntaje_turno)
         self.dados_disponibles = dados_disponibles
 
     def fin_turno(self):
         """Modifica el estado al terminar el turno."""
         self.puntaje_turno_miles = 0
+        self.puntaje_turno = 0
         self.dados_disponibles = 6
+
+    def __call__(self):
+        return self.puntaje_turno_miles, self.dados_disponibles
 
     def __str__(self):
         """Representación en texto de EstadoDiezMil.

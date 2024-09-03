@@ -1,8 +1,7 @@
 import numpy as np
 from tqdm import tqdm
-from template import Validador
 from ambiente import AmbienteDiezMil
-from utils import JUGADA_PLANTARSE, JUGADA_TIRAR
+from utils import JUGADA_PLANTARSE, JUGADA_TIRAR, RANGOS
 
 class AgenteQLearning:
     """Agente que implementa el algoritmo de Q-Learning."""
@@ -25,14 +24,14 @@ class AgenteQLearning:
             epsilon (float): Probabilidad de explorar.
         """
         self.ambiente = ambiente
-        self.alpha = alpha  # 0.1
-        self.gamma = gamma  # 0.9 ?cuanto me importa el futuro?
-        self.epsilon = epsilon  # 0.1
-        # Se puede cuantizar los 10k (nunca puedo tener 1,2,3...49, etc puntos)
+        self.alpha = alpha  
+        self.gamma = gamma  
+        self.epsilon = epsilon
+
         forma = (
-            12,
-            7,
-            2
+            len(RANGOS),     # PUNTOS TURNO
+            7,               # DADOS DISPONIBLES
+            2                # ACCIONES
         )
         q_init_scale = 1
         self.init_q_table(forma, q_init_scale)
@@ -54,13 +53,13 @@ class AgenteQLearning:
         Selecciona una acción de acuerdo a una política ε-greedy.
         """
 
-        estado = (self.ambiente.estado.puntaje_turno_miles, self.ambiente.estado.dados_disponibles)
-
         if np.random.rand() < self.epsilon:
             return np.random.choice(self.posibles_acciones)
         else:
             # Select either self.posibles_acciones[0] or self.posibles_acciones[1] based on the Q table
-            if self.q_table[estado[0], estado[1], self.posibles_acciones[0]] >= self.q_table[estado[0], estado[1], self.posibles_acciones[1]]:
+            accion_1 = (self.ambiente.estado()) + (self.posibles_acciones[0],)
+            accion_2 = (self.ambiente.estado()) + (self.posibles_acciones[1],)
+            if self.q_table[accion_1] >= self.q_table[accion_2]:
                 return self.posibles_acciones[0]
             else:
                 return self.posibles_acciones[1]
@@ -78,39 +77,23 @@ class AgenteQLearning:
         for _ in iterator:
             self.ambiente.reset()
             juego_finalizado = False
+            turno_finalizado = False
 
             # while not juego_finalizado:
-            while self.ambiente.puntaje_total < 10000:
+            while not juego_finalizado:
 
                 accion = self.elegir_accion()
-                pts = self.ambiente.estado.puntaje_turno_miles
-                dados = self.ambiente.estado.dados_disponibles
+                estado = self.ambiente.estado()
 
-                q_actual = self.q_table[
-                    pts,
-                    dados,
-                    accion,
-                ]
+                q_actual = self.q_table[(estado) + (accion,)]
 
                 recompensa, turno_finalizado, juego_finalizado = self.ambiente.step(accion)
 
-                q_siguiente = np.max(
-                    self.q_table[
-                        self.ambiente.estado.puntaje_turno_miles,
-                        self.ambiente.estado.dados_disponibles if not turno_finalizado else 0,
-                        :,
-                    ]
-                )
+                q_siguiente = np.max(self.q_table[self.ambiente.estado()])
 
-                self.q_table[
-                    pts,
-                    dados,
-                    accion,
-                ] = q_actual + self.alpha * (
+                self.q_table[(estado) + (accion,)] = q_actual + self.alpha * (
                     recompensa + self.gamma * q_siguiente - q_actual
                 )
-
-
 
     def q_table2pol(self):
         """Convierte la tabla Q en una política."""

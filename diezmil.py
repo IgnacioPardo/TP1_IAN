@@ -6,6 +6,7 @@ from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 seed = 42
 random.seed(seed)
 
+
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
         self.jugador: Jugador = jugador
@@ -73,7 +74,7 @@ class JuegoDiezMil:
 
 
 def main():
-    from template import JugadorEntrenado
+    from jugador import JugadorEntrenado
 
     jugador = JugadorAleatorio("random")
     juego = JuegoDiezMil(jugador)

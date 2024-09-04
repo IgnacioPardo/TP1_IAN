@@ -1,7 +1,8 @@
 import numpy as np
 from tqdm import tqdm
 from ambiente import AmbienteDiezMil
-from utils import JUGADA_PLANTARSE, JUGADA_TIRAR, RANGOS
+from utils import JUGADA_PLANTARSE, JUGADA_TIRAR
+
 
 class AgenteQLearning:
     """Agente que implementa el algoritmo de Q-Learning."""
@@ -24,14 +25,14 @@ class AgenteQLearning:
             epsilon (float): Probabilidad de explorar.
         """
         self.ambiente = ambiente
-        self.alpha = alpha  
-        self.gamma = gamma  
+        self.alpha = alpha
+        self.gamma = gamma
         self.epsilon = epsilon
 
         forma = (
-            len(self.ambiente.range_snaper.rangos),     # PUNTOS TURNO
-            7,               # DADOS DISPONIBLES
-            2                # ACCIONES
+            len(self.ambiente.range_snaper.rangos),  # PUNTOS TURNO
+            7,  # DADOS DISPONIBLES
+            2,  # ACCIONES
         )
         q_init_scale = 1
         self.init_q_table(forma, q_init_scale)
@@ -39,14 +40,14 @@ class AgenteQLearning:
 
     def init_q_table(self, shape, q_init_scale: float = 1):
         """
-            Inicializa la tabla Q con valores aleatorios.
+        Inicializa la tabla Q con valores aleatorios.
 
-            Args:
-                shape (tuple): Dimensiones de la tabla Q.
-                q_init_scale (float): Escala para los valores iniciales de la tabla
+        Args:
+            shape (tuple): Dimensiones de la tabla Q.
+            q_init_scale (float): Escala para los valores iniciales de la tabla
         """
         self.q_table = np.random.uniform(0, 1, shape) * q_init_scale
-        #self.q_table = np.zeros(shape)
+        # self.q_table = np.zeros(shape)
 
     def elegir_accion(self):
         """
@@ -87,7 +88,9 @@ class AgenteQLearning:
 
                 q_actual = self.q_table[(estado) + (accion,)]
 
-                recompensa, turno_finalizado, juego_finalizado = self.ambiente.step(accion)
+                recompensa, turno_finalizado, juego_finalizado = self.ambiente.step(
+                    accion
+                )
 
                 q_siguiente = np.max(self.q_table[self.ambiente.estado()])
 

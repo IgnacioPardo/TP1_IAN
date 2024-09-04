@@ -2,35 +2,52 @@ import numpy as np
 from random import randint
 from abc import ABC, abstractmethod
 from utils import puntaje_y_no_usados, JUGADA_PLANTARSE, JUGADA_TIRAR, RangeSnaper
-from DQN import DQNetwork
-import torch
+
 
 class Jugador(ABC):
     @abstractmethod
-    def jugar(self, puntaje_total:int, puntaje_turno:int, dados:list[int],
-              verbose:bool=False) -> tuple[int,list[int]]:
+    def jugar(
+        self,
+        puntaje_total: int,
+        puntaje_turno: int,
+        dados: list[int],
+        verbose: bool = False,
+    ) -> tuple[int, list[int]]:
         pass
 
+
 class JugadorAleatorio(Jugador):
-    def __init__(self, nombre:str):
+    def __init__(self, nombre: str):
         self.nombre = nombre
-        
-    def jugar(self, puntaje_total:int, puntaje_turno:int, dados:list[int],
-              verbose:bool=False) -> tuple[int,list[int]]:
+
+    def jugar(
+        self,
+        puntaje_total: int,
+        puntaje_turno: int,
+        dados: list[int],
+        verbose: bool = False,
+    ) -> tuple[int, list[int]]:
         (puntaje, no_usados) = puntaje_y_no_usados(dados)
-        if randint(0, 1)==0:
+        if randint(0, 1) == 0:
             return (JUGADA_PLANTARSE, [])
         else:
             return (JUGADA_TIRAR, no_usados)
 
+
 class JugadorSiempreSePlanta(Jugador):
-    def __init__(self, nombre:str):
+    def __init__(self, nombre: str):
         self.nombre = nombre
-        
-    def jugar(self, puntaje_total:int, puntaje_turno:int, dados:list[int], 
-              verbose:bool=False) -> tuple[int,list[int]]:
+
+    def jugar(
+        self,
+        puntaje_total: int,
+        puntaje_turno: int,
+        dados: list[int],
+        verbose: bool = False,
+    ) -> tuple[int, list[int]]:
         return (JUGADA_PLANTARSE, [])
-    
+
+
 class JugadorEntrenado(Jugador):
     """Jugador que implementa una política entrenada con un agente de RL.
 
@@ -57,7 +74,7 @@ class JugadorEntrenado(Jugador):
         puntaje_total: int,
         puntaje_turno: int,
         dados: list[int],
-        verbose:bool=False
+        verbose: bool = False,
     ) -> tuple[int, list[int]]:
         """Devuelve una jugada y los dados a tirar.
 
@@ -75,9 +92,7 @@ class JugadorEntrenado(Jugador):
         if puntaje == 0:
             pts = 0
 
-        jugada = self.posibles_acciones[
-            int(self.politica[pts, len(no_usados)])
-        ]
+        jugada = self.posibles_acciones[int(self.politica[pts, len(no_usados)])]
 
         if jugada == JUGADA_PLANTARSE:
             return (JUGADA_PLANTARSE, [])
@@ -93,6 +108,7 @@ class JugadorEntrenado(Jugador):
         #     return (JUGADA_PLANTARSE, [])
         # elif jugada==JUGADA_TIRAR:
         #     return (JUGADA_TIRAR, no_usados)
+
 
 class JugadorFromPolicy(Jugador):
     """Jugador que implementa una política entrenada con un agente de RL.
@@ -111,7 +127,7 @@ class JugadorFromPolicy(Jugador):
         puntaje_total: int,
         puntaje_turno: int,
         dados: list[int],
-        verbose:bool=False
+        verbose: bool = False,
     ) -> tuple[int, list[int]]:
         """Devuelve una jugada y los dados a tirar.
 
@@ -127,15 +143,16 @@ class JugadorFromPolicy(Jugador):
         _, no_usados = puntaje_y_no_usados(dados)
         estado = (self.range_snaper.snap(puntaje_turno), len(no_usados))
 
-        jugada = self.posibles_acciones[
-            int(self.politica[estado])
-        ]            
+        jugada = self.posibles_acciones[int(self.politica[estado])]
 
         if jugada == JUGADA_PLANTARSE:
             return (JUGADA_PLANTARSE, [])
         elif jugada == JUGADA_TIRAR:
             return (JUGADA_TIRAR, no_usados)
-        
+
+
+# from DQN import DQNetwork
+# import torch
 # class JugadorFromDQNPolicy(Jugador):
 #     """Jugador que implementa una política entrenada con un agente DQN.
 
@@ -178,7 +195,7 @@ class JugadorFromPolicy(Jugador):
 
 #         # Convertir el estado a un tensor para la red neuronal
 #         estado_tensor = torch.tensor(estado, dtype=torch.float32)
-        
+
 #         # Predecir la acción con la red neuronal
 #         with torch.no_grad():
 #             q_values = self.q_network(estado_tensor)

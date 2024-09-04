@@ -11,16 +11,25 @@ JUGADAS_STR = {
 }
 
 RANGOS = [
-    (0, 1), (1, 250), (250, 500),(500, 750), (750, 1000), (1000, 2000), (2000, 5000), (5000, 10000), (10000, int(1e10))
+    (0, 1),
+    (1, 250),
+    (250, 500),
+    (500, 750),
+    (750, 1000),
+    (1000, 2000),
+    (2000, 5000),
+    (5000, 10000),
+    (10000, int(1e10)),
 ]
 
+
 def puntaje_y_no_usados(ds: list[int]) -> tuple[int, list[int]]:
-    ''' Dada ds, una lista de enteros del 1 al 6 (dados), devuelve una tupla
-        con el puntaje de los dados y los dados no usados (en orden).
-        Precondición: len(ds)>0
-        Ejemplo: para [2,1,3,1,4,5], devuelve (250, [2,3,4]) porque 100+100+50
-        y no se usaron los dados 2, 3, 4.
-    '''
+    """Dada ds, una lista de enteros del 1 al 6 (dados), devuelve una tupla
+    con el puntaje de los dados y los dados no usados (en orden).
+    Precondición: len(ds)>0
+    Ejemplo: para [2,1,3,1,4,5], devuelve (250, [2,3,4]) porque 100+100+50
+    y no se usaron los dados 2, 3, 4.
+    """
     # Dejo en cants las veces que salió cada número.
     cants: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
     for d in ds:
@@ -55,11 +64,11 @@ def puntaje_y_no_usados(ds: list[int]) -> tuple[int, list[int]]:
 
 
 def separar(xs: list[int], ys: list[int]) -> list[int]:
-    ''' Devuelve la lista resultante de eliminar la primera instancia en xs 
-        de cada elemento de ys.
-        Precondición: ys está incluido en xs.
-        Ejemplo: separar([3,2,4,2,1,2,3,2], [2,3,2]) --> [4,1,2,3,2]
-    '''
+    """Devuelve la lista resultante de eliminar la primera instancia en xs
+    de cada elemento de ys.
+    Precondición: ys está incluido en xs.
+    Ejemplo: separar([3,2,4,2,1,2,3,2], [2,3,2]) --> [4,1,2,3,2]
+    """
     res: list[int] = list(xs)
     for y in ys:
         res.remove(y)
@@ -71,17 +80,17 @@ def separar(xs: list[int], ys: list[int]) -> list[int]:
 
 #     # Definir los rangos y sus valores asociados
 #     rangos = RANGOS
-    
+
 #     # Verificar en qué rango cae el valor de entrada
 #     for i, (inicio, fin) in enumerate(rangos):
 #         if inicio <= valor_entrada < fin:
 #             return i
-        
 
-class RangeSnaper():
+
+class RangeSnaper:
     """Clase que permite 'snappear' valores a un rango en miles."""
 
-    def __init__(self, rangos = RANGOS):
+    def __init__(self, rangos=RANGOS):
         self.rangos = rangos
 
     def snap(self, valor_entrada):
@@ -90,4 +99,3 @@ class RangeSnaper():
         for i, (inicio, fin) in enumerate(self.rangos):
             if inicio <= valor_entrada < fin:
                 return i
-    

@@ -2,6 +2,7 @@ import argparse
 from ambiente import AmbienteDiezMil
 from agente import AgenteQLearning
 
+
 def main(episodios, verbose):
     # Crear una instancia del ambiente
     ambiente = AmbienteDiezMil()
@@ -14,13 +15,26 @@ def main(episodios, verbose):
     agente.guardar_politica(f"politica_{episodios}.csv")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Crear un analizador de argumentos
-    parser = argparse.ArgumentParser(description="Entrenar un agente usando Q-learning en el ambiente de 'Diez Mil'.")
+    parser = argparse.ArgumentParser(
+        description="Entrenar un agente usando Q-learning en el ambiente de 'Diez Mil'."
+    )
 
     # Agregar argumentos
-    parser.add_argument('-e', '--episodios', type=int, default=10000, help='Número de episodios para entrenar al agente (default: 10000)')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Activar modo verbose para ver más detalles durante el entrenamiento')
+    parser.add_argument(
+        "-e",
+        "--episodios",
+        type=int,
+        default=10000,
+        help="Número de episodios para entrenar al agente (default: 10000)",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Activar modo verbose para ver más detalles durante el entrenamiento",
+    )
 
     # Parsear los argumentos
     args = parser.parse_args()

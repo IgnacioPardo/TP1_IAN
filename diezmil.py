@@ -1,7 +1,10 @@
 from random import randint
+import random
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 
+seed = 42
+random.seed(seed)
 
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):

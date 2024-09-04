@@ -29,7 +29,7 @@ class AgenteQLearning:
         self.epsilon = epsilon
 
         forma = (
-            len(RANGOS),     # PUNTOS TURNO
+            len(self.ambiente.range_snaper.rangos),     # PUNTOS TURNO
             7,               # DADOS DISPONIBLES
             2                # ACCIONES
         )
@@ -46,7 +46,7 @@ class AgenteQLearning:
                 q_init_scale (float): Escala para los valores iniciales de la tabla
         """
         self.q_table = np.random.uniform(0, 1, shape) * q_init_scale
-        # self.q_table = np.zeros(shape)
+        #self.q_table = np.zeros(shape)
 
     def elegir_accion(self):
         """

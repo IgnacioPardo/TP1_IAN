@@ -11,20 +11,7 @@ JUGADAS_STR = {
 }
 
 RANGOS = [
-    (0, 1),
-    (1, 50),
-    (50, 100),
-    (100, 150),
-    (150, 200),
-    (200, 250),
-    (250, 350),
-    (350, 500),
-    (500, 750),
-    (750, 1000),
-    (1000, 2000),
-    (2000, 5000),
-    (5000, 10000),
-    (10000, int(1e10))
+    (0, 1), (1, 250), (250, 500),(500, 750), (750, 1000), (1000, 2000), (2000, 5000), (5000, 10000), (10000, int(1e10))
 ]
 
 def puntaje_y_no_usados(ds: list[int]) -> tuple[int, list[int]]:
@@ -79,14 +66,28 @@ def separar(xs: list[int], ys: list[int]) -> list[int]:
     return res
 
 
-def snap_puntos(valor_entrada):
-    """Dado un valor de entrada, retorna el rango al que pertenece en miles."""
+# def snap_puntos(valor_entrada):
+#     """Dado un valor de entrada, retorna el rango al que pertenece en miles."""
 
-    # Definir los rangos y sus valores asociados
-    rangos = RANGOS
+#     # Definir los rangos y sus valores asociados
+#     rangos = RANGOS
     
-    # Verificar en qué rango cae el valor de entrada
-    for i, (inicio, fin) in enumerate(rangos):
-        if inicio <= valor_entrada < fin:
-            return i
+#     # Verificar en qué rango cae el valor de entrada
+#     for i, (inicio, fin) in enumerate(rangos):
+#         if inicio <= valor_entrada < fin:
+#             return i
+        
+
+class RangeSnaper():
+    """Clase que permite 'snappear' valores a un rango en miles."""
+
+    def __init__(self, rangos = RANGOS):
+        self.rangos = rangos
+
+    def snap(self, valor_entrada):
+        """Dado un valor de entrada, retorna el rango al que pertenece en miles."""
+        # Verificar en qué rango cae el valor de entrada
+        for i, (inicio, fin) in enumerate(self.rangos):
+            if inicio <= valor_entrada < fin:
+                return i
     

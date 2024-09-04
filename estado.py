@@ -1,4 +1,4 @@
-from utils import snap_puntos
+from utils import RangeSnaper
 
 class EstadoDiezMil:
     """Representación de un estado del juego 10.000."""
@@ -56,7 +56,7 @@ class EstadoDiezMil:
 class EstadoDiezMilv2:
     """Representación de un estado del juego 10.000."""
 
-    def __init__(self):
+    def __init__(self, rs : RangeSnaper):
         """Definir qué hace a un estado de diez mil.
         Recordar que la complejidad del estado repercute en la complejidad de la tabla del agente de q-learning.
 
@@ -69,6 +69,7 @@ class EstadoDiezMilv2:
         # Solo para calcular el puntaje en miles
         # NO es parte del estado
         self.puntaje_turno: int = 0
+        self.rs = rs
 
         # Variables del estado
         self.puntaje_turno_miles: int = 0
@@ -81,7 +82,7 @@ class EstadoDiezMilv2:
             args: (Puntaje acumulado del turno, cantidad de dados disponibles)
         """
         self.puntaje_turno += puntaje
-        self.puntaje_turno_miles = snap_puntos(self.puntaje_turno)
+        self.puntaje_turno_miles = self.rs.snap(self.puntaje_turno)
         self.dados_disponibles = dados_disponibles
 
     def fin_turno(self):

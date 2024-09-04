@@ -46,5 +46,5 @@ class Validador:
         Returns:
             float: Turnos promedio necesarios para llegar a 10.000.
         """
-        jugador = JugadorFromPolicy(politica)
+        jugador = JugadorFromPolicy(politica, self.ambiente.range_snaper)
         return self.validar_jugador(jugador, episodios)

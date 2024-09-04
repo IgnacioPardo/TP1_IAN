@@ -55,10 +55,11 @@ class JugadorEntrenado(Jugador):
         Jugador (_type_): _description_
     """
 
-    def __init__(self, nombre: str, filename_politica: str):
+    def __init__(self, nombre: str, filename_politica: str, rs: RangeSnaper):
         self.nombre = nombre
         self.politica = self._leer_politica(filename_politica, SEP=",")
         self.posibles_acciones = [JUGADA_PLANTARSE, JUGADA_TIRAR]
+        self.range_snaper = rs
 
     def _leer_politica(self, filename: str, SEP: str = ","):
         """Carga una politica entrenada con un agente de RL, que está guardada
@@ -87,27 +88,15 @@ class JugadorEntrenado(Jugador):
             tuple[int,list[int]]: Una jugada y la lista de dados a tirar.
         """
 
-        puntaje, no_usados = puntaje_y_no_usados(dados)
-        pts = puntaje_turno  # + puntaje
-        if puntaje == 0:
-            pts = 0
+        _, no_usados = puntaje_y_no_usados(dados)
+        estado = (self.range_snaper.snap(puntaje_turno), len(no_usados))
 
-        jugada = self.posibles_acciones[int(self.politica[pts, len(no_usados)])]
+        jugada = self.posibles_acciones[int(self.politica[estado])]
 
         if jugada == JUGADA_PLANTARSE:
             return (JUGADA_PLANTARSE, [])
         elif jugada == JUGADA_TIRAR:
             return (JUGADA_TIRAR, no_usados)
-
-        # puntaje, no_usados = puntaje_y_no_usados(dados)
-        # COMPLETAR
-        # estado = ...
-        # jugada = self.politica[estado]
-
-        # if jugada==JUGADA_PLANTARSE:
-        #     return (JUGADA_PLANTARSE, [])
-        # elif jugada==JUGADA_TIRAR:
-        #     return (JUGADA_TIRAR, no_usados)
 
 
 class JugadorFromPolicy(Jugador):

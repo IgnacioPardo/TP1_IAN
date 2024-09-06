@@ -1,11 +1,22 @@
 import argparse
 from ambiente import AmbienteDiezMil
 from agente import AgenteQLearning
+from utils import RangeSnaper
+
+RANGOS_ENTRENADOS =  [
+    (0, 1),
+    (1, 250),
+    (250, 500),
+    (500, 750),
+    (750, 1000),
+    (1000, 5000),
+    (5000, int(1e10))
+]
 
 
 def main(episodios, verbose):
     # Crear una instancia del ambiente
-    ambiente = AmbienteDiezMil()
+    ambiente = AmbienteDiezMil(rs=RangeSnaper(RANGOS_ENTRENADOS))
 
     # Crear un agente de Q-learning
     agente = AgenteQLearning(ambiente)

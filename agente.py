@@ -12,9 +12,7 @@ class AgenteQLearning:
         ambiente: AmbienteDiezMil,
         alpha: float = 0.1,
         gamma: float = 0.9,
-        epsilon: float = 0.1,
-        # *args,
-        # **kwargs,
+        epsilon: float = 0.1
     ):
         """Definir las variables internas de un Agente que implementa el algoritmo de Q-Learning.
 
@@ -47,7 +45,6 @@ class AgenteQLearning:
             q_init_scale (float): Escala para los valores iniciales de la tabla
         """
         self.q_table = np.random.uniform(0, 1, shape) * q_init_scale
-        # self.q_table = np.zeros(shape)
 
     def elegir_accion(self):
         """

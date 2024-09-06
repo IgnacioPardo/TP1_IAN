@@ -1,9 +1,11 @@
 import argparse
 from diezmil import JuegoDiezMil
 from jugador import JugadorEntrenado
+from entrenar import RANGOS_ENTRENADOS
+from utils import RangeSnaper
 
 def main(politica_filename, verbose):
-    jugador = JugadorEntrenado('qlearning', politica_filename)
+    jugador = JugadorEntrenado('qlearning', politica_filename, rs=RangeSnaper(RANGOS_ENTRENADOS))
     juego = JuegoDiezMil(jugador)
     cantidad_turnos, puntaje_final = juego.jugar(verbose=verbose)
 
